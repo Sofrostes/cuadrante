@@ -1,0 +1,38 @@
+{% extends "admin_base.html" %}
+{% block title %}Informe{% endblock %}
+{% block content %}
+<h1>Informe de cambios (últimos 7 días)</h1>
+
+<div class="card">
+    <p>Cambios pendientes de volcar a Excel: <strong>{{ pendientes }}</strong></p>
+    <form method="post" action="/admin/informe/forzar-volcado"
+          onsubmit="return confirm('¿Marcar todos como volcados?')">
+        <button class="btn btn-primary">Forzar volcado</button>
+    </form>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Fecha</th><th>Solicitante</th><th>Compañero</th>
+            <th>Día A</th><th>Serv. A</th><th>Día B</th><th>Serv. B</th><th>Volcado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for f in filas %}
+        <tr>
+            <td>{{ f.fecha }}</td>
+            <td>{{ f.solicitante.nombre if f.solicitante else '?' }}</td>
+            <td>{{ f.companero.nombre if f.companero else '?' }}</td>
+            <td>{{ f.dia_solicitante }}</td>
+            <td>{{ f.serv_solicitante }}</td>
+            <td>{{ f.dia_companero }}</td>
+            <td>{{ f.serv_companero }}</td>
+            <td>{{ '✅' if f.volcado else '⏳' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8">Sin cambios en los últimos 7 días.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ zona.codigo }} - Mayo 2026</title>
+    <style>
+        body { font-family: sans-serif; padding: 1rem; background: #fafafa; }
+        .barra {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #1a4e8a; padding-bottom: 0.6rem; margin-bottom: 1rem;
+        }
+        .barra h1 { color: #1a4e8a; margin: 0; font-size: 1.3rem; }
+        .usuario { color: #333; font-size: 0.85rem; }
+        .usuario a { color: #1a4e8a; margin-left: 1rem; }
+        .subtitulo { color: #666; margin-bottom: 1rem; }
+
+        table { border-collapse: collapse; background: white; font-size: 12px; }
+        th, td {
+            border: 1px solid #ccc; padding: 3px 5px; text-align: center;
+            min-width: 28px;
+        }
+        th.agente {
+            text-align: left; min-width: 240px; background: #1a4e8a; color: white;
+            position: sticky; left: 0; z-index: 2;
+        }
+        th.dia { background: #1a4e8a; color: white; min-width: 28px; }
+        th.num-ag { background: #2a6cb8; color: white; min-width: 60px; }
+        td.agente {
+            text-align: left; background: #eef4fb; font-weight: bold;
+            position: sticky; left: 0; z-index: 1;
+        }
+        td.num-ag { background: #eef4fb; }
+        tr:nth-child(even) td { background: #f9fbfd; }
+        tr:nth-child(even) td.agente { background: #dce9f7; }
+
+        .serv-imp { background: #fff2a8 !important; }
+        .serv-par { background: #b9d9f5 !important; }
+        .serv-d   { background: #e0e0e0 !important; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="barra">
+        <h1>{{ zona.codigo }} · Mayo 2026</h1>
+        <div class="usuario">
+            <b>{{ agente_logueado.nombre }}</b>
+            <a href="/">← Zonas</a>
+            <a href="/logout">Salir</a>
+        </div>
+    </div>
+    <div class="subtitulo">{{ zona.nombre }} · {{ agentes|length }} agentes</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="agente">Agente</th>
+                <th class="num-ag">Nº</th>
+                {% for d in dias %}
+                    <th class="dia">{{ d }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for ag in agentes %}
+            <tr>
+                <td class="agente">{{ ag.nombre }}</td>
+                <td class="num-ag">{{ ag.num_agente }}</td>
+                {% for d in dias %}
+                    {% set s = matriz[ag.id][d] %}
+                    {% set cls = '' %}
+                    {% if s %}
+                        {% if s == 'D' or s == 'E' %}
+                            {% set cls = 'serv-d' %}
+                        {% elif s[0].isdigit() %}
+                            {% set num_str = (s|string)|replace('F','')|replace('S','')|replace('N','') %}
+                            {% if num_str and num_str.isdigit() %}
+                                {% if (num_str|int) % 2 == 1 %}
+                                    {% set cls = 'serv-imp' %}
+                                {% else %}
+                                    {% set cls = 'serv-par' %}
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                    <td class="{{ cls }}">{{ s }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,0 +1,58 @@
+{% extends "admin_base.html" %}
+{% block title %}Bloqueos{% endblock %}
+{% block content %}
+<h1>Días bloqueados</h1>
+
+<div class="card">
+    <h3>Añadir bloqueo</h3>
+    <form method="post" action="/admin/bloqueos/añadir" class="inline">
+        <label>Fecha
+            <input type="date" name="fecha" required>
+        </label>
+        <label>Agente (opcional)
+            <select name="agente_id">
+                <option value="">— ninguno —</option>
+                {% for a in agentes %}
+                    <option value="{{ a.id }}">{{ a.num_agente }} — {{ a.nombre }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Zona (opcional)
+            <select name="zona_id">
+                <option value="">— ninguna —</option>
+                {% for z in zonas %}
+                    <option value="{{ z.id }}">{{ z.codigo }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Motivo
+            <input type="text" name="motivo" placeholder="opcional">
+        </label>
+        <button type="submit" class="btn btn-primary">Añadir</button>
+    </form>
+</div>
+
+<table>
+    <thead>
+        <tr><th>Fecha</th><th>Agente</th><th>Zona</th><th>Motivo</th><th></th></tr>
+    </thead>
+    <tbody>
+        {% for b in bloqueos %}
+        <tr>
+            <td>{{ b.fecha }}</td>
+            <td>{{ b.agente_id or '—' }}</td>
+            <td>{{ b.zona_id or '—' }}</td>
+            <td>{{ b.motivo or '—' }}</td>
+            <td>
+                <form method="post" action="/admin/bloqueos/{{ b.id }}/eliminar"
+                      onsubmit="return confirm('¿Eliminar?')">
+                    <button class="btn btn-danger">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">Sin bloqueos.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

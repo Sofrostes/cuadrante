@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cambiar PIN</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f4fa; display: flex;
+               align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .caja {
+            background: white; padding: 2.5rem 2rem; border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 360px;
+        }
+        h1 { color: #1a4e8a; margin-top: 0; font-size: 1.3rem; text-align: center; }
+        p { text-align: center; color: #666; font-size: 0.9rem; }
+        label { display: block; margin-bottom: 0.3rem; color: #333; font-size: 0.9rem; }
+        input {
+            width: 100%; padding: 0.6rem; margin-bottom: 1rem;
+            border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;
+        }
+        button {
+            width: 100%; padding: 0.7rem; background: #1a4e8a; color: white;
+            border: none; border-radius: 6px; font-size: 1rem; cursor: pointer;
+        }
+        .error {
+            background: #ffe0e0; color: #a00; padding: 0.7rem; border-radius: 6px;
+            margin-bottom: 1rem; font-size: 0.9rem; text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="caja">
+        <h1>🔐 Cambiar PIN</h1>
+        <p>Hola <b>{{ agente.nombre }}</b>.<br>Debes cambiar tu PIN antes de continuar.</p>
+        {% if error %}<div class="error">{{ error }}</div>{% endif %}
+        <form method="post" action="/cambiar-pin">
+            <label>PIN actual</label>
+            <input type="password" name="pin_actual" required autofocus>
+            <label>PIN nuevo (mínimo 4 caracteres)</label>
+            <input type="password" name="pin_nuevo" required>
+            <label>Repetir PIN nuevo</label>
+            <input type="password" name="pin_repetir" required>
+            <button type="submit">Guardar</button>
+        </form>
+    </div>
+</body>
+</html>

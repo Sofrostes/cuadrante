@@ -1,0 +1,35 @@
+{% extends "admin_base.html" %}
+{% block title %}Agentes{% endblock %}
+{% block content %}
+<h1>Agentes</h1>
+
+<table>
+    <thead>
+        <tr><th>Nº</th><th>Nombre</th><th>Zona</th><th>Activo</th><th>PIN</th><th></th></tr>
+    </thead>
+    <tbody>
+        {% for a in agentes %}
+        <tr>
+            <td>{{ a.num_agente }}</td>
+            <td>{{ a.nombre }}</td>
+            <td>{{ zonas.get(a.zona_id, '?') }}</td>
+            <td>{{ '✅' if a.activo else '❌' }}</td>
+            <td>{{ 'definido' if a.pin_hash else 'sin definir (1234)' }}</td>
+            <td style="display:flex; gap:.4rem;">
+                <form method="post" action="/admin/agentes/{{ a.id }}/reset-pin"
+                      onsubmit="return confirm('¿Resetear PIN?')">
+                    <button class="btn btn-secondary">Reset PIN</button>
+                </form>
+                <form method="post" action="/admin/agentes/{{ a.id }}/toggle-activo">
+                    <button class="btn {{ 'btn-danger' if a.activo else 'btn-primary' }}">
+                        {{ 'Desactivar' if a.activo else 'Activar' }}
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6">Sin agentes.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

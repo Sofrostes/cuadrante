@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio · Cuadrantes</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: system-ui, sans-serif;
+               background: #f1f5f9; color: #1e293b; padding: 2rem; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center;
+                 margin-bottom: 1.5rem; }
+        h1 { margin: 0; font-size: 1.6rem; }
+        .nav a { color: #3b82f6; text-decoration: none; margin-left: 1rem;
+                 position: relative; display: inline-block; padding-right: 1.4rem; }
+        .nav a:hover { text-decoration: underline; }
+        .badge { position: absolute; top: -8px; right: -4px;
+                 background: #ef4444; color: white; font-size: .7rem;
+                 padding: 2px 6px; border-radius: 999px; font-weight: bold;
+                 min-width: 18px; text-align: center; }
+        .banner { background: #fef3c7; border-left: 4px solid #f59e0b;
+                  padding: .75rem 1rem; border-radius: 6px; margin-bottom: 1.2rem;
+                  color: #78350f; display: flex; justify-content: space-between;
+                  align-items: center; gap: 1rem; flex-wrap: wrap; }
+        .banner a { color: #b45309; font-weight: bold; text-decoration: underline; }
+        .card { background: white; padding: 1.5rem; border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 1rem; }
+        .zona { display: block; padding: .8rem 1rem; background: #f8fafc;
+                border: 1px solid #e2e8f0; border-radius: 6px;
+                text-decoration: none; color: #1e293b; margin-bottom: .5rem; }
+        .zona:hover { background: #eff6ff; border-color: #3b82f6; }
+        .muted { color: #64748b; font-size: .9rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Hola, {{ agente.nombre }}</h1>
+        <nav class="nav">
+            <a href="/solicitudes-pendientes">
+                🔔 Mis solicitudes
+                {% if pendientes and pendientes > 0 %}
+                    <span class="badge">{{ pendientes }}</span>
+                {% endif %}
+            </a>
+            <a href="/solicitar-cambio">Solicitar cambio</a>
+            <a href="/logout">Salir</a>
+        </nav>
+    </header>
+
+    {% if pendientes and pendientes > 0 %}
+    <div class="banner">
+        <span>
+            🔔 Tienes <strong>{{ pendientes }}</strong>
+            solicitud{{ 'es' if pendientes != 1 else '' }} de cambio pendiente{{ 's' if pendientes != 1 else '' }}.
+        </span>
+        <a href="/solicitudes-pendientes">Ver ahora →</a>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3 style="margin-top:0;">Zonas</h3>
+        {% if zonas %}
+            {% for z in zonas %}
+            <a class="zona" href="/zona/{{ z.codigo }}">
+                <strong>{{ z.codigo }}</strong> — {{ z.nombre }}
+            </a>
+            {% endfor %}
+        {% else %}
+            <p class="muted">No hay zonas cargadas todavía.</p>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

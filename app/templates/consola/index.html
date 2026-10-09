@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Consola · Restricciones de turnos</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+    .bloque { border:1px solid #ccc; border-radius:8px; padding:1rem 1.25rem; margin-bottom:1rem; }
+    .bloque h2 { font-size:1rem; margin:0 0 .5rem; }
+    .row { display:flex; gap:1rem; align-items:center; margin:.5rem 0; }
+    .row label { min-width: 160px; }
+    input[type=text], input[type=date], input[type=number] {
+      padding:.4rem .5rem; border:1px solid #bbb; border-radius:6px; font-size:.95rem;
+    }
+    .estado { padding:.75rem 1rem; border-radius:8px; margin-top:.75rem; font-family: ui-monospace, monospace; white-space:pre-wrap; }
+    .ok { background:#ecfdf5; border:1px solid #10b981; color:#065f46; }
+    .error { background:#fef2f2; border:1px solid #ef4444; color:#7f1d1d; }
+    .aviso { background:#fffbeb; border:1px solid #f59e0b; color:#78350f; }
+  </style>
+</head>
+<body>
+  <h1>Consola de restricciones</h1>
+
+  <div class="bloque">
+    <div class="row">
+      <label>Trabajador (id)</label>
+      <input type="number" id="trabajador_id">
+    </div>
+    <div class="row">
+      <label>Grupo (AE6, opcional)</label>
+      <input type="text" id="grupo">
+    </div>
+    <div class="row">
+      <label>Fecha (día del cambio)</label>
+      <input type="date" id="fecha">
+    </div>
+    <div class="row">
+      <label>Turno solicitado</label>
+      <input type="text" id="turno">
+    </div>
+    <button onclick="evaluar()">Evaluar</button>
+  </div>
+
+  <div class="bloque">
+    <h2>Estado actual</h2>
+    <div id="contexto" class="estado" style="display:none"></div>
+  </div>
+
+  <script>
+  async function evaluar() {
+    const q = new URLSearchParams({
+      trabajador_id: document.getElementById('trabajador_id').value,
+      grupo: document.getElementById('grupo').value,
+      fecha: document.getElementById('fecha').value,
+      turno_solicitado: document.getElementById('turno').value,
+    });
+    const r = await fetch('/consola/evaluar?' + q.toString());
+    const data = await r.json();
+    const ctx = document.getElementById('contexto');
+    ctx.style.display = 'block';
+
+    const ev = data.evaluacion;
+    let cls = ev.ok ? 'ok' : 'error';
+    let msg = `Fecha actual: ${data.fecha_actual}\n`;
+    msg += `Fecha posterior: ${data.fecha_posterior}\n`;
+    msg += `Turno previo (día actual): ${data.turno_actual_previo ?? '—'}\n`;
+    msg += `Turno solicitado: ${document.getElementById('turno').value}\n`;
+    msg += `Turno día posterior: ${data.turno_dia_posterior ?? '—'}\n\n`;
+
+    if (!ev.ok) {
+      if (ev.bloqueos?.length) {
+        msg += `🚫 DÍA BLOQUEADO: ${ev.mensaje}\n`;
+      }
+      for (const inc of (ev.incompatibilidades || [])) {
+        msg += `⚠ Incompatibilidad (${inc.tipo}): ${inc.turno_previo} → ${inc.turno_nuevo}\n`;
+        msg += `   ${inc.motivo || ''}\n`;
+      }
+    } else {
+      msg += '✅ Sin restricciones. Se puede aceptar el cambio.';
+    }
+
+    ctx.className = 'estado ' + cls;
+    ctx.textContent = msg;
+  }
+  </script>
+</body>
+</html>

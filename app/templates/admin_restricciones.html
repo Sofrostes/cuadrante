@@ -1,0 +1,52 @@
+{% extends "admin_base.html" %}
+{% block title %}Restricciones{% endblock %}
+{% block content %}
+<h1>Restricciones entre servicios</h1>
+
+<div class="card">
+    <h3>Añadir restricción</h3>
+    <form method="post" action="/admin/restricciones/añadir" class="inline">
+        <label>Origen
+            <select name="servicio_origen" required>
+                {% for s in servicios %}
+                    <option value="{{ s.codigo }}">{{ s.codigo }} — {{ s.descripcion or '' }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Destino
+            <select name="servicio_destino" required>
+                {% for s in servicios %}
+                    <option value="{{ s.codigo }}">{{ s.codigo }} — {{ s.descripcion or '' }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Motivo
+            <input type="text" name="motivo" placeholder="opcional">
+        </label>
+        <button type="submit" class="btn btn-primary">Añadir</button>
+    </form>
+</div>
+
+<table>
+    <thead>
+        <tr><th>Origen</th><th>Destino</th><th>Motivo</th><th></th></tr>
+    </thead>
+    <tbody>
+        {% for r in restricciones %}
+        <tr>
+            <td>{{ r.servicio_origen }}</td>
+            <td>{{ r.servicio_destino }}</td>
+            <td>{{ r.motivo or '—' }}</td>
+            <td>
+                <form method="post" action="/admin/restricciones/{{ r.id }}/eliminar"
+                      onsubmit="return confirm('¿Eliminar?')">
+                    <button class="btn btn-danger">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4">Sin restricciones.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

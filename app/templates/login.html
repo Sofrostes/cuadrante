@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar sesión</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f4fa; display: flex;
+               align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .caja {
+            background: white; padding: 2.5rem 2rem; border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 340px;
+        }
+        h1 { color: #1a4e8a; margin-top: 0; font-size: 1.4rem; text-align: center; }
+        label { display: block; margin-bottom: 0.3rem; color: #333; font-size: 0.9rem; }
+        input {
+            width: 100%; padding: 0.6rem; margin-bottom: 1rem;
+            border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;
+            font-size: 1rem;
+        }
+        button {
+            width: 100%; padding: 0.7rem; background: #1a4e8a; color: white;
+            border: none; border-radius: 6px; font-size: 1rem; cursor: pointer;
+        }
+        button:hover { background: #153f6f; }
+        .error {
+            background: #ffe0e0; color: #a00; padding: 0.7rem; border-radius: 6px;
+            margin-bottom: 1rem; font-size: 0.9rem; text-align: center;
+        }
+        .info {
+            background: #e6f0fb; color: #1a4e8a; padding: 0.7rem; border-radius: 6px;
+            margin-bottom: 1rem; font-size: 0.8rem; text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="caja">
+        <h1>📅 Cuadrantes</h1>
+        {% if error %}<div class="error">{{ error }}</div>{% endif %}
+        <div class="info">Primera vez: PIN por defecto <b>1234</b></div>
+        <form method="post" action="/login">
+            <label>Nº de agente</label>
+            <input type="text" name="num_agente" required autofocus>
+            <label>PIN</label>
+            <input type="password" name="pin" required>
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
+</body>
+</html>

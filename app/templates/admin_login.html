@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin · Cuadrantes</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background: #1e293b; color: #e2e8f0;
+               display: flex; justify-content: center; align-items: center;
+               min-height: 100vh; margin: 0; }
+        .card { background: #334155; padding: 2rem 2.5rem; border-radius: 12px;
+                box-shadow: 0 10px 25px rgba(0,0,0,.3); width: 320px; }
+        h1 { margin-top: 0; font-size: 1.3rem; text-align: center; color: #f1f5f9; }
+        label { display: block; margin: .8rem 0 .3rem; font-size: .9rem; }
+        input { width: 100%; padding: .6rem; border-radius: 6px; border: 1px solid #475569;
+                background: #1e293b; color: #f1f5f9; box-sizing: border-box; }
+        button { width: 100%; margin-top: 1.2rem; padding: .7rem; border: none;
+                 border-radius: 6px; background: #3b82f6; color: white;
+                 font-size: 1rem; cursor: pointer; }
+        button:hover { background: #2563eb; }
+        .error { background: #7f1d1d; padding: .6rem; border-radius: 6px;
+                 margin-bottom: 1rem; font-size: .9rem; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔐 Panel de administración</h1>
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        <form method="post" action="/admin/login">
+            <label>Usuario</label>
+            <input type="text" name="usuario" required autofocus>
+            <label>Contraseña</label>
+            <input type="password" name="password" required>
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cuadrantes</title>
+    <style>
+        body { font-family: sans-serif; padding: 2rem; max-width: 900px; margin: auto; }
+        .barra {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #1a4e8a; padding-bottom: 1rem; margin-bottom: 1.5rem;
+        }
+        .barra h1 { color: #1a4e8a; margin: 0; }
+        .usuario { color: #333; font-size: 0.9rem; }
+        .usuario a {
+            color: #1a4e8a; margin-left: 1rem;
+            text-decoration: none; font-weight: bold;
+        }
+        .usuario a:hover { text-decoration: underline; }
+        .zonas { display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; }
+        .zona {
+            padding: 1.5rem 2rem; background: #eef4fb; border-radius: 8px;
+            text-decoration: none; color: #1a4e8a; font-weight: bold;
+            border: 2px solid #1a4e8a; font-size: 1.2rem;
+        }
+        .zona:hover { background: #1a4e8a; color: white; }
+    </style>
+</head>
+<body>
+    <div class="barra">
+        <h1>📅 Cuadrante Mayo 2026</h1>
+        <div class="usuario">
+            <b>{{ agente.nombre }}</b> ({{ agente.num_agente }})
+            <a href="/solicitar-cambio">🔄 Solicitar cambio</a>
+            <a href="/logout">Salir</a>
+        </div>
+    </div>
+    <p>Selecciona una zona:</p>
+    <div class="zonas">
+        {% for z in zonas %}
+            <a class="zona" href="/zona/{{ z.codigo }}">{{ z.codigo }}</a>
+        {% endfor %}
+    </div>
+</body>
+</html>

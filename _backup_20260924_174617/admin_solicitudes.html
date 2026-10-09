@@ -1,0 +1,30 @@
+{% extends "admin_base.html" %}
+{% block title %}Solicitudes{% endblock %}
+{% block content %}
+<h1>Histórico de solicitudes</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Fecha</th><th>Solicitante</th><th>Compañero</th>
+            <th>Día A</th><th>Serv. A</th><th>Día B</th><th>Serv. B</th><th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for f in filas %}
+        <tr>
+            <td>{{ f.fecha }}</td>
+            <td>{{ f.solicitante.nombre if f.solicitante else '?' }}</td>
+            <td>{{ f.companero.nombre if f.companero else '?' }}</td>
+            <td>{{ f.dia_solicitante }}</td>
+            <td>{{ f.serv_solicitante }}</td>
+            <td>{{ f.dia_companero }}</td>
+            <td>{{ f.serv_companero }}</td>
+            <td>{{ f.estado }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8">Sin solicitudes.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

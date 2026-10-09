@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Solicitudes pendientes</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background: #f1f5f9; color: #1e293b;
+               margin: 0; padding: 2rem; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { margin-top: 0; }
+        .card { background: white; padding: 1.2rem 1.5rem; border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 1.5rem; }
+        .card h3 { margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: .55rem .7rem; text-align: left;
+                 border-bottom: 1px solid #e2e8f0; font-size: .92rem; }
+        th { background: #f8fafc; font-size: .8rem; color: #475569;
+             text-transform: uppercase; }
+        .btn { padding: .35rem .75rem; border-radius: 6px; border: none;
+               cursor: pointer; font-size: .85rem; }
+        .btn-success { background: #22c55e; color: white; }
+        .btn-success:hover { background: #16a34a; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .ok { background: #dcfce7; color: #166534; padding: .6rem 1rem;
+              border-radius: 6px; margin-bottom: 1rem; }
+        .error { background: #fee2e2; color: #991b1b; padding: .6rem 1rem;
+                 border-radius: 6px; margin-bottom: 1rem; }
+        .nav { margin-bottom: 1rem; }
+        .nav a { color: #3b82f6; text-decoration: none; margin-right: 1rem; }
+        .muted { color: #64748b; font-size: .85rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="nav">
+        <a href="/">← Inicio</a>
+        <a href="/solicitar-cambio">Solicitar un cambio</a>
+        <a href="/logout" style="float:right;">Salir</a>
+    </div>
+
+    <h1>🔔 Solicitudes de cambio</h1>
+
+    {% if ok %}<div class="ok">{{ ok }}</div>{% endif %}
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+    <div class="card">
+        <h3>Te piden cambiar (pendientes de tu autorización)</h3>
+        {% if pendientes %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Compañero</th>
+                    <th>Su día</th>
+                    <th>Su servicio</th>
+                    <th>Tu día</th>
+                    <th>Tu servicio</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in pendientes %}
+                <tr>
+                    <td>
+                        {% set sol = solicitantes.get(s.solicitante_id) %}
+                        {{ sol.nombre if sol else '?' }}
+                    </td>
+                    <td>{{ s.dia_solicitante }}</td>
+                    <td>{{ s.servicio_solicitante }}</td>
+                    <td>{{ s.dia_companero }}</td>
+                    <td>{{ s.servicio_companero }}</td>
+                    <td style="display:flex; gap:.4rem;">
+                        <form method="post" action="/solicitudes/{{ s.id }}/aceptar">
+                            <button class="btn btn-success">Aceptar</button>
+                        </form>
+                        <form method="post" action="/solicitudes/{{ s.id }}/rechazar"
+                              onsubmit="return confirm('¿Rechazar esta solicitud?')">
+                            <button class="btn btn-danger">Rechazar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted">No tienes solicitudes pendientes.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h3>Has enviado (esperando respuesta)</h3>
+        {% if enviadas %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Compañero</th>
+                    <th>Tu día</th>
+                    <th>Su día</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in enviadas %}
+                <tr>
+                    <td>
+                        {% set comp = companeros.get(s.companero_id) %}
+                        {{ comp.nombre if comp else '?' }}
+                    </td>
+                    <td>{{ s.dia_solicitante }} ({{ s.servicio_solicitante }})</td>
+                    <td>{{ s.dia_companero }} ({{ s.servicio_companero }})</td>
+                    <td>⏳ Pendiente</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="muted">No has enviado ninguna solicitud pendiente.</p>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

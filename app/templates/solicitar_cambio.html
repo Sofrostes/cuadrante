@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Solicitar cambio</title>
+    <style>
+        body { font-family: sans-serif; padding: 1.5rem; background: #fafafa; }
+        .barra {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #1a4e8a; padding-bottom: 0.6rem; margin-bottom: 1.5rem;
+        }
+        .barra h1 { color: #1a4e8a; margin: 0; font-size: 1.3rem; }
+        .usuario a { color: #1a4e8a; margin-left: 1rem; text-decoration: none; }
+        .usuario a:hover { text-decoration: underline; }
+
+        h2 { color: #1a4e8a; font-size: 1rem; margin-top: 1.5rem; }
+        .aviso { padding: 0.8rem 1rem; border-radius: 6px; margin-bottom: 1rem; }
+        .aviso.error { background: #ffe0e0; color: #a00; border: 1px solid #f5c2c7; }
+        .aviso.ok    { background: #e0ffe6; color: #060; border: 1px solid #a8e6b0; }
+
+        .form-cambio {
+            background: white; padding: 1.5rem; border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 2rem;
+            display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-end;
+        }
+        .campo { display: flex; flex-direction: column; }
+        .campo label { font-size: 0.8rem; color: #555; margin-bottom: 0.3rem; }
+        .campo select, .campo input {
+            padding: 0.5rem; border: 1px solid #ccc; border-radius: 6px; font-size: 0.9rem;
+            min-width: 160px;
+        }
+        button.enviar {
+            padding: 0.6rem 1.5rem; background: #1a4e8a; color: white; border: none;
+            border-radius: 6px; cursor: pointer; font-weight: bold;
+        }
+        button.enviar:hover { background: #153f6f; }
+
+        table { border-collapse: collapse; background: white; font-size: 12px; }
+        th, td {
+            border: 1px solid #ccc; padding: 3px 5px; text-align: center;
+            min-width: 28px;
+        }
+        th.agente { text-align: left; min-width: 220px; background: #1a4e8a; color: white; }
+        th.dia { background: #1a4e8a; color: white; }
+        td.agente { text-align: left; background: #eef4fb; font-weight: bold; }
+        tr:nth-child(even) td { background: #f9fbfd; }
+        tr:nth-child(even) td.agente { background: #dce9f7; }
+
+        .serv-imp { background: #fff2a8 !important; }
+        .serv-par { background: #b9d9f5 !important; }
+        .serv-d   { background: #e0e0e0 !important; color: #888; }
+        .no-cambiable { color: #bbb; }
+    </style>
+</head>
+<body>
+    <div class="barra">
+        <h1>🔄 Solicitar cambio · Zona {{ agente.zona.codigo }}</h1>
+        <div class="usuario">
+            <b>{{ agente.nombre }}</b>
+            <a href="/">← Inicio</a>
+            <a href="/logout">Salir</a>
+        </div>
+    </div>
+
+    {% if error %}<div class="aviso error">{{ error }}</div>{% endif %}
+    {% if ok %}<div class="aviso ok">{{ ok }}</div>{% endif %}
+
+    <h2>1) Selecciona tu día y el de tu compañero</h2>
+    <form method="post" action="/solicitar-cambio" class="form-cambio">
+        <div class="campo">
+            <label>Mi día</label>
+            <select name="dia_solicitante" id="dia_solicitante" required>
+                <option value="">— elige tu día —</option>
+                {% for r in mis_registros %}
+                    <option value="{{ r.dia }}"
+                            data-servicio="{{ r.servicio }}"
+                            data-cambiable="{{ 'si' if r.servicio in servicios_cambiables else 'no' }}">
+                        Día {{ r.dia }} — {{ r.servicio }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="campo">
+            <label>Compañero</label>
+            <select name="companero_id" id="companero_id" required>
+                <option value="">— elige compañero —</option>
+                {% for c in companeros %}
+                    <option value="{{ c.id }}">{{ c.nombre }} ({{ c.num_agente }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="campo">
+            <label>Su día</label>
+            <select name="dia_companero" id="dia_companero" required>
+                <option value="">— elige el día del compañero —</option>
+            </select>
+        </div>
+
+        <button type="submit" class="enviar">Solicitar cambio</button>
+    </form>
+
+    <h2>2) Mi cuadrante en la zona</h2>
+    <table>
+        <thead>
+            <tr>
+                <th class="agente">Agente</th>
+                {% for d in range(1, 32) %}
+                    <th class="dia">{{ d }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="agente">TÚ — {{ agente.nombre }}</td>
+                {% for d in range(1, 32) %}
+                    {% set reg = mis_registros | selectattr('dia', 'equalto', d) | list | first %}
+                    <td>{{ reg.servicio if reg else '' }}</td>
+                {% endfor %}
+            </tr>
+            {% for c in companeros %}
+                <tr>
+                    <td class="agente">{{ c.nombre }}</td>
+                    {% for d in range(1, 32) %}
+                        {% set s = matriz_companeros[c.id].get(d, '') %}
+                        <td>{{ s }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        // Cuando eligen compañero, cargamos sus días en el 3er desplegable
+        const companeroSel = document.getElementById("companero_id");
+        const diaCompSel = document.getElementById("dia_companero");
+        const matriz = {{ matriz_companeros | tojson }};
+
+        companeroSel.addEventListener("change", () => {
+            const cid = companeroSel.value;
+            diaCompSel.innerHTML = '<option value="">— elige el día del compañero —</option>';
+            if (!cid || !matriz[cid]) return;
+            const dias = Object.keys(matriz[cid]).sort((a,b) => a-b);
+            for (const d of dias) {
+                const s = matriz[cid][d];
+                const opt = document.createElement("option");
+                opt.value = d;
+                opt.textContent = `Día ${d} — ${s}`;
+                diaCompSel.appendChild(opt);
+            }
+        });
+    </script>
+</body>
+</html>
